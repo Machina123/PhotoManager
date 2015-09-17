@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Photo Manager</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="label_camera">Zdjęcie</string>
+    <string name="title_activity_picture">PictureActivity</string>
+</resources>
