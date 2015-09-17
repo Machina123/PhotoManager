@@ -27,7 +27,7 @@ public class PictureActivity extends AppCompatActivity {
             if(success) {
                 Toast.makeText(PictureActivity.this, "Stworzono katalog aplikacji", Toast.LENGTH_SHORT).show();
             } else {
-                Toast.makeText(PictureActivity.this, "Nie stworzono katalogu aplikacji", Toast.LENGTH_SHORT).show();
+                Toast.makeText(PictureActivity.this, "Nie udało się stworzyć katalogu aplikacji", Toast.LENGTH_SHORT).show();
             }
         }
         super.onStart();
