@@ -2,11 +2,13 @@ package net.machina.photomanager.common;
 
 public class DirectoryEntry {
     private String name;
+    private String path;
     private int iconResId;
 
-    public DirectoryEntry(String name, int iconResId) {
-        this.name = name;
+    public DirectoryEntry(int iconResId, String name, String path) {
         this.iconResId = iconResId;
+        this.name = name;
+        this.path = path;
     }
 
     public String getName() {
@@ -23,5 +25,13 @@ public class DirectoryEntry {
 
     public void setIconResId(int iconResId) {
         this.iconResId = iconResId;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
     }
 }
