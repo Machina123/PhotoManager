@@ -14,7 +14,7 @@ import net.machina.photomanager.common.DirectoryEntryListAdapter;
 import java.io.File;
 import java.util.ArrayList;
 
-public class PictureActivity extends AppCompatActivity {
+public class GalleryActivity extends AppCompatActivity {
 
     protected static File startingDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
     protected ListView listDirs;
@@ -26,9 +26,9 @@ public class PictureActivity extends AppCompatActivity {
         if (!myDirectory.exists()) {
             boolean success = myDirectory.mkdirs();
             if(success) {
-                Toast.makeText(PictureActivity.this, "Stworzono katalog aplikacji", Toast.LENGTH_SHORT).show();
+                Toast.makeText(GalleryActivity.this, "Stworzono katalog aplikacji", Toast.LENGTH_SHORT).show();
             } else {
-                Toast.makeText(PictureActivity.this, "Nie udało się stworzyć katalogu aplikacji", Toast.LENGTH_SHORT).show();
+                Toast.makeText(GalleryActivity.this, "Nie udało się stworzyć katalogu aplikacji", Toast.LENGTH_SHORT).show();
             }
         }
 
@@ -51,7 +51,7 @@ public class PictureActivity extends AppCompatActivity {
                 directories.add(new DirectoryEntry(file.isDirectory() ? R.mipmap.ic_directory : R.mipmap.ic_imagefile, file.getName(), file.getAbsolutePath()));
             }
 
-            final DirectoryEntryListAdapter adapter = new DirectoryEntryListAdapter(PictureActivity.this, R.layout.layout_direntry, directories);
+            final DirectoryEntryListAdapter adapter = new DirectoryEntryListAdapter(GalleryActivity.this, R.layout.layout_direntry, directories);
             listDirs.setAdapter(adapter);
         }
     }
