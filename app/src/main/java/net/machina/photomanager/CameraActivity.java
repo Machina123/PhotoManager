@@ -12,23 +12,71 @@ import android.view.Surface;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import net.machina.photomanager.common.CameraPreview;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 @SuppressWarnings("deprecation")
 public class CameraActivity extends AppCompatActivity implements View.OnClickListener {
 
+    public String path;
     protected Camera camera;
     protected int cameraId;
     protected CameraPreview preview;
     protected FrameLayout cameraPrev;
     protected ImageView btnShutter;
+    protected ImageView btnAccept, btnReject;
+    protected LinearLayout layoutCamSettings;
     protected Camera.PictureCallback jpegCallback = new Camera.PictureCallback() {
         @Override
         public void onPictureTaken(byte[] data, Camera camera) {
-            Toast.makeText(CameraActivity.this, "Zrobiono zdjęcie (hahaha jk nope)", Toast.LENGTH_LONG).show();
-            camera.startPreview();
+            final byte[] thisData = data;
+            final Camera thisCamera = camera;
+
+            layoutCamSettings.setVisibility(View.GONE);
+            btnShutter.setVisibility(View.GONE);
+            btnAccept.setVisibility(View.VISIBLE);
+            btnReject.setVisibility(View.VISIBLE);
+
+            btnReject.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    layoutCamSettings.setVisibility(View.VISIBLE);
+                    btnShutter.setVisibility(View.VISIBLE);
+                    btnAccept.setVisibility(View.GONE);
+                    btnReject.setVisibility(View.GONE);
+                    thisCamera.startPreview();
+                }
+            });
+
+            btnAccept.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    SimpleDateFormat dFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
+                    String filename = dFormat.format(new Date());
+                    File newPhoto = new File(path + "/" + filename + ".jpg");
+                    try {
+                        FileOutputStream fos = new FileOutputStream(newPhoto);
+                        fos.write(thisData);
+                        fos.close();
+                        Toast.makeText(CameraActivity.this, "Zapisano zdjęcie!", Toast.LENGTH_SHORT).show();
+                    } catch (Exception e) {
+                        Toast.makeText(CameraActivity.this, "Nie można było zapisać zdjęcia", Toast.LENGTH_SHORT).show();
+                        e.printStackTrace();
+                    }
+                    layoutCamSettings.setVisibility(View.VISIBLE);
+                    btnShutter.setVisibility(View.VISIBLE);
+                    btnAccept.setVisibility(View.GONE);
+                    btnReject.setVisibility(View.GONE);
+                    thisCamera.startPreview();
+                }
+            });
         }
     };
 
@@ -69,7 +117,12 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
+        if (getIntent().getStringExtra("path") == null) return;
+        path = getIntent().getStringExtra("path");
         btnShutter = (ImageView) findViewById(R.id.btnShutter);
+        layoutCamSettings = (LinearLayout) findViewById(R.id.layoutCameraTop);
+        btnAccept = (ImageView) findViewById(R.id.btnAccept);
+        btnReject = (ImageView) findViewById(R.id.btnReject);
         if (btnShutter != null) btnShutter.setOnClickListener(this);
         initCamera();
     }
@@ -132,4 +185,5 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
 
         return returned;
     }
+
 }

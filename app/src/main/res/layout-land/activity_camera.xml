@@ -13,6 +13,7 @@
         android:id="@+id/layoutCameraTop"
         android:layout_width="80dp"
         android:layout_height="match_parent"
+        android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:background="#7f000000"
@@ -59,17 +60,23 @@
         android:id="@+id/layoutCameraBottom"
         android:layout_width="80dp"
         android:layout_height="match_parent"
-        android:layout_alignParentBottom="false"
-        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="false"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
         android:background="#7f000000"
         android:orientation="vertical">
 
-        <Space
+        <ImageView
+            android:id="@+id/btnAccept"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:background="#00000000"
+            android:contentDescription="Akceptuj"
+            android:padding="12dp"
+            android:src="@mipmap/ic_accept"
+            android:visibility="gone" />
 
         <ImageView
             android:id="@+id/btnShutter"
@@ -78,12 +85,19 @@
             android:layout_weight="1"
             android:background="#00000000"
             android:clickable="true"
-            android:padding="8dp"
+            android:padding="4dp"
             android:src="@mipmap/ic_shutter" />
 
-        <Space
+        <ImageView
+            android:id="@+id/btnReject"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:background="#00000000"
+            android:contentDescription="Odrzuć"
+            android:padding="12dp"
+            android:src="@mipmap/ic_reject"
+            android:visibility="gone" />
+
     </LinearLayout>
 </RelativeLayout>
