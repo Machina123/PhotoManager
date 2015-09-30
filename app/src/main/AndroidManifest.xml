@@ -24,7 +24,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".GalleryActivity"
+            android:name=".GallerySelectorActivity"
             android:label="@string/title_activity_picture"
             android:parentActivityName=".HelloActivity">
             <meta-data
@@ -38,6 +38,10 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="net.machina.photomanager.HelloActivity" />
+        </activity>
+        <activity
+            android:name=".GalleryActivity"
+            android:label="@string/title_activity_gallery">
         </activity>
     </application>
 

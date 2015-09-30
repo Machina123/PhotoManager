@@ -40,15 +40,23 @@ public class HelloActivity extends AppCompatActivity implements View.OnClickList
 
     @Override
     public void onClick(View v) {
+        Intent intent;
+        Bundle extras = new Bundle();
+
         switch(v.getId()) {
             case R.id.btnCamera:
-                //TODO: start aktywności kamery
+                extras.putInt("activityMethod", 1);
+                intent = new Intent(HelloActivity.this, GallerySelectorActivity.class);
+                intent.putExtras(extras);
+                startActivity(intent);
                 break;
             case R.id.btnGallery:
-                startActivity(new Intent(HelloActivity.this, GalleryActivity.class));
+                extras.putInt("activityMethod", 0);
+                intent = new Intent(HelloActivity.this, GallerySelectorActivity.class);
+                intent.putExtras(extras);
+                startActivity(intent);
                 break;
             default:
-                return;
         }
     }
 }
