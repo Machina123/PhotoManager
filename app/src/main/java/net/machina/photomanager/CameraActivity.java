@@ -32,7 +32,15 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
     protected FrameLayout cameraPrev;
     protected ImageView btnShutter;
     protected ImageView btnAccept, btnReject;
+    protected ImageView btnExposure, btnWhiteBalance, btnResolution;
     protected LinearLayout layoutCamSettings;
+
+    protected int[] exposureLevels;
+    protected String[] whiteBalanceLevels;
+    protected Camera.Size[] photoSizeList;
+
+    protected Camera.Parameters camParams;
+
     protected Camera.PictureCallback jpegCallback = new Camera.PictureCallback() {
         @Override
         public void onPictureTaken(byte[] data, Camera camera) {
@@ -123,6 +131,9 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
         layoutCamSettings = (LinearLayout) findViewById(R.id.layoutCameraTop);
         btnAccept = (ImageView) findViewById(R.id.btnAccept);
         btnReject = (ImageView) findViewById(R.id.btnReject);
+        btnExposure = (ImageView) findViewById(R.id.btnExposure);
+        btnWhiteBalance = (ImageView) findViewById(R.id.btnWhiteBalance);
+        btnResolution = (ImageView) findViewById(R.id.btnResolution);
         if (btnShutter != null) btnShutter.setOnClickListener(this);
         initCamera();
     }
@@ -167,6 +178,8 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
                 cameraPrev.setOnClickListener(this);
                 cameraPrev.addView(preview);
                 setCameraDisplayOrientation(this, cameraId, camera);
+                getCameraParameters();
+
             }
         }
     }
@@ -186,4 +199,85 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
         return returned;
     }
 
+    protected void getCameraParameters() {
+        if(camera != null) {
+            camParams = camera.getParameters();
+            exposureLevels = new int[((camParams.getMaxExposureCompensation() * 2) + 1)];
+            int j = 0;
+            for(int i = camParams.getMinExposureCompensation(); i <= camParams.getMaxExposureCompensation(); i++) {
+                exposureLevels[j++] = i;
+            }
+
+            whiteBalanceLevels = new String[camParams.getSupportedWhiteBalance().size()];
+            photoSizeList = new Camera.Size[camParams.getSupportedPictureSizes().size()];
+
+            camParams.getSupportedWhiteBalance().toArray(whiteBalanceLevels);
+            camParams.getSupportedPictureSizes().toArray(photoSizeList);
+
+            final String[] resStrings = new String[photoSizeList.length];
+            for(int i = 0; i < photoSizeList.length; i++) {
+                resStrings[i] = photoSizeList[i].width + " x " + photoSizeList[i].height;
+            }
+
+            btnResolution.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    AlertDialog.Builder dialogRes = new AlertDialog.Builder(CameraActivity.this);
+                    dialogRes   .setTitle("Rozmiar zdjęcia")
+                                .setCancelable(true)
+                                .setItems(resStrings, new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        camParams.setPictureSize(photoSizeList[which].width, photoSizeList[which].height);
+                                        camera.setParameters(camParams);
+                                        Toast.makeText(CameraActivity.this, "Zmieniono rozdzielczość na " + resStrings[which], Toast.LENGTH_SHORT).show();
+                                    }
+                                })
+                                .show();
+                }
+            });
+
+            btnWhiteBalance.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    AlertDialog.Builder dialogWB = new AlertDialog.Builder(CameraActivity.this);
+                    dialogWB.setTitle("Balans bieli")
+                            .setCancelable(true)
+                            .setItems(whiteBalanceLevels, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    camParams.setWhiteBalance(whiteBalanceLevels[which]);
+                                    Toast.makeText(CameraActivity.this, "Zmieniono balans bieli na " + whiteBalanceLevels[which], Toast.LENGTH_SHORT).show();
+                                    camera.setParameters(camParams);
+                                }
+                            })
+                            .show();
+                }
+            });
+
+            final String[] expValues = new String[exposureLevels.length];
+            for(int i = 0; i < exposureLevels.length; i++) {
+                expValues[i] = exposureLevels[i] + "";
+            }
+
+            btnExposure.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    AlertDialog.Builder dialogExp = new AlertDialog.Builder(CameraActivity.this);
+                    dialogExp   .setTitle("Wartość ekspozycji")
+                                .setCancelable(true)
+                                .setItems(expValues, new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        camParams.setExposureCompensation(exposureLevels[which]);
+                                        Toast.makeText(CameraActivity.this, "Zmieniono wartość ekspozycji na " + expValues[which], Toast.LENGTH_SHORT).show();
+                                        camera.setParameters(camParams);
+                                    }
+                                })
+                                .show();
+                }
+            });
+
+        }
+    }
 }
