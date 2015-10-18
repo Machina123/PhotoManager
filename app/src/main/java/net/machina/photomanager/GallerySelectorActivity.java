@@ -1,12 +1,16 @@
 package net.machina.photomanager;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -24,6 +28,7 @@ public class GallerySelectorActivity extends AppCompatActivity {
     protected ArrayList<DirectoryEntry> directories = new ArrayList<>();
     protected File myDirectory = new File(startingDir.getPath() + "/" + Constants.APP_FOLDER + "/");
     protected ActivityMethod method;
+    protected LinearLayout btnAddLibrary;
 
     @Override
     protected void onStart() {
@@ -47,6 +52,9 @@ public class GallerySelectorActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_picture);
+
+        btnAddLibrary = (LinearLayout) findViewById(R.id.btnNewGallery);
+
         Bundle extras = getIntent().getExtras();
 
         if (extras != null) {
@@ -68,6 +76,59 @@ public class GallerySelectorActivity extends AppCompatActivity {
 
         listDirs = (ListView) findViewById(R.id.listFolders);
 
+        loadDirectories();
+
+        btnAddLibrary.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder dialogNewGallery = new AlertDialog.Builder(GallerySelectorActivity.this);
+                final EditText txtNewGallery = new EditText(GallerySelectorActivity.this);
+                dialogNewGallery.setTitle("Nazwa nowej galerii?")
+                        .setView(txtNewGallery)
+                        .setPositiveButton("Stwórz", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                String dir = txtNewGallery.getText().toString();
+                                File getDir = new File(startingDir.getPath() + "/" + Constants.APP_FOLDER + "/" + dir + "/");
+                                if (!getDir.exists()) {
+                                    getDir.mkdirs();
+                                    loadDirectories();
+                                } else {
+                                    Toast.makeText(GallerySelectorActivity.this, "Taki katalog już istnieje!", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        })
+                        .setNegativeButton("Anuluj", null)
+                        .show();
+            }
+        });
+    }
+
+    public boolean generateStartingDirs() {
+        String[] startDirs = {"miejsca", "osoby", "przedmioty"};
+        boolean isSuccess = true;
+
+        for (String dir : startDirs) {
+            File getDir = new File(startingDir.getPath() + "/" + Constants.APP_FOLDER + "/" + dir + "/");
+            if (!getDir.exists()) {
+                isSuccess = getDir.mkdirs();
+            }
+        }
+
+        return isSuccess;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        return false;
+    }
+
+    protected enum ActivityMethod {
+        ViewGallery,
+        TakePhoto
+    }
+
+    public void loadDirectories() {
         directories.clear();
         if (myDirectory != null) {
             for (File file : myDirectory.listFiles()) {
@@ -99,30 +160,4 @@ public class GallerySelectorActivity extends AppCompatActivity {
             });
         }
     }
-
-    public boolean generateStartingDirs() {
-        String[] startDirs = {"miejsca", "osoby", "przedmioty"};
-
-        boolean isSuccess = true;
-
-        for (String dir : startDirs) {
-            File getDir = new File(startingDir.getPath() + "/" + Constants.APP_FOLDER + "/" + dir + "/");
-            if (!getDir.exists()) {
-                isSuccess = getDir.mkdirs();
-            }
-        }
-
-        return isSuccess;
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        return false;
-    }
-
-    protected enum ActivityMethod {
-        ViewGallery,
-        TakePhoto
-    }
-
 }

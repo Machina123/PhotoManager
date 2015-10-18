@@ -1,26 +1,33 @@
 package net.machina.photomanager;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.Point;
+import android.graphics.Rect;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.Surface;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import net.machina.photomanager.common.CameraPreview;
+import net.machina.photomanager.common.Circle;
+import net.machina.photomanager.common.Constants;
+import net.machina.photomanager.common.ImageThumbnail;
+import net.machina.photomanager.common.ScaledBitmap;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.ArrayList;
 
 @SuppressWarnings("deprecation")
 public class CameraActivity extends AppCompatActivity implements View.OnClickListener {
@@ -40,32 +47,66 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
     protected Camera.Size[] photoSizeList;
 
     protected Camera.Parameters camParams;
+    protected Circle circle;
+
+    protected boolean isCircleDrawn = false;
+
+    protected ArrayList<byte[]> pictures = new ArrayList<>();
+    protected ArrayList<Bitmap> thumbnails = new ArrayList<>();
+    protected ArrayList<ImageThumbnail> thumbnailViews = new ArrayList<>();
 
     protected Camera.PictureCallback jpegCallback = new Camera.PictureCallback() {
         @Override
         public void onPictureTaken(byte[] data, Camera camera) {
             final byte[] thisData = data;
             final Camera thisCamera = camera;
-
-            layoutCamSettings.setVisibility(View.GONE);
-            btnShutter.setVisibility(View.GONE);
+            Rect displaySize = new Rect();
             btnAccept.setVisibility(View.VISIBLE);
             btnReject.setVisibility(View.VISIBLE);
+
+            if (cameraPrev != null && !isCircleDrawn) {
+                cameraPrev.addView(circle);
+                isCircleDrawn = true;
+            }
+
+            WindowManager wm = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
+            wm.getDefaultDisplay().getRectSize(displaySize);
+
+            pictures.add(data);
+            thumbnails.add(ScaledBitmap.makeFromRaw(data, displaySize.width() / 10, displaySize.width() / 10));
+            ImageThumbnail thumbnail = new ImageThumbnail(CameraActivity.this, thumbnails.get(thumbnails.size() - 1), circle.getPointOnCircle(0), displaySize.width() / 10, displaySize.width() / 10);
+            cameraPrev.addView(thumbnail);
+            thumbnailViews.add(thumbnail);
+
+            camera.startPreview();
+
+            int newPicAngle = (int) ((2 * Math.PI) / thumbnailViews.size());
+
+            for (int i = 0; i < thumbnailViews.size(); i++) {
+                Point newPoint = circle.getPointOnCircle(i * newPicAngle);
+                Log.d(Constants.LOGGER_TAG, i + ": " + newPoint.toString());
+                thumbnailViews.get(i).setmCenterPoint(newPoint);
+                thumbnailViews.get(i).redraw();
+            }
+
 
             btnReject.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    /*
                     layoutCamSettings.setVisibility(View.VISIBLE);
                     btnShutter.setVisibility(View.VISIBLE);
                     btnAccept.setVisibility(View.GONE);
                     btnReject.setVisibility(View.GONE);
                     thisCamera.startPreview();
+                    */
                 }
             });
 
             btnAccept.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    /*
                     SimpleDateFormat dFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
                     String filename = dFormat.format(new Date());
                     File newPhoto = new File(path + "/" + filename + ".jpg");
@@ -83,10 +124,12 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
                     btnAccept.setVisibility(View.GONE);
                     btnReject.setVisibility(View.GONE);
                     thisCamera.startPreview();
+                    */
                 }
             });
         }
     };
+
 
     public static void setCameraDisplayOrientation(Activity activity,
                                                    int cameraId, android.hardware.Camera camera) {
@@ -136,13 +179,16 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
         btnResolution = (ImageView) findViewById(R.id.btnResolution);
         if (btnShutter != null) btnShutter.setOnClickListener(this);
         initCamera();
+        circle = new Circle(CameraActivity.this);
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btnShutter:
+
                 if (camera != null) camera.takePicture(null, null, jpegCallback);
+
                 break;
             case R.id.layoutCameraPreview:
                 if (camera != null) camera.autoFocus(null);
