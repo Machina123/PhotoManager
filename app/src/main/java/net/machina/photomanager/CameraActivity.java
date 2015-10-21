@@ -74,11 +74,17 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
 
             pictures.add(data);
             thumbnails.add(ScaledBitmap.makeFromRaw(data, displaySize.width() / 10, displaySize.width() / 10));
-            ImageThumbnail thumbnail = new ImageThumbnail(CameraActivity.this, thumbnails.get(thumbnails.size() - 1), circle.getPointOnCircle(0), displaySize.width() / 10, displaySize.width() / 10);
+            ImageThumbnail thumbnail = new ImageThumbnail(CameraActivity.this,
+                    thumbnails.get(thumbnails.size() -1),
+                    circle.getPointOnCircle(0),
+                    displaySize.width() / 10,
+                    displaySize.width() / 10);
+
             cameraPrev.addView(thumbnail);
-            thumbnailViews.add(thumbnail);
+            //thumbnailViews.add(thumbnail);
 
             camera.startPreview();
+/*
 
             int newPicAngle = (int) ((2 * Math.PI) / thumbnailViews.size());
 
@@ -88,6 +94,7 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
                 thumbnailViews.get(i).setmCenterPoint(newPoint);
                 thumbnailViews.get(i).redraw();
             }
+*/
 
 
             btnReject.setOnClickListener(new View.OnClickListener() {
