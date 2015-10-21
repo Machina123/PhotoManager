@@ -1,81 +1,48 @@
 package net.machina.photomanager.common;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Matrix;
+import android.graphics.Paint;
 import android.graphics.Point;
-import android.graphics.Rect;
-import android.widget.ImageView;
+import android.view.View;
 
 /**
- * Created by machina on 15.10.2015.
+ * Created by Machina on 21.10.2015.
  */
-public class ImageThumbnail extends ImageView {
-    private Bitmap mImage;
-    private Point mCenterPoint;
-    private int mWidth, mHeight;
-    private Rect desiredRect = new Rect();
-    private Canvas mCanvas;
-    protected Context mContext;
+public class ImageThumbnail extends View {
 
-    public int getmHeight() {
-        return mHeight;
-    }
+    protected static int STROKE_COLOR = 0xffffffff;
 
-    public void setmHeight(int mHeight) {
-        this.mHeight = mHeight;
-        this.invalidate();
-    }
+    protected Bitmap mImage, mRotatedImage;
+    protected Point mCenterPoint;
+    protected Paint mPaint;
+    protected Matrix matrix;
 
-    public Point getmCenterPoint() {
-        return mCenterPoint;
-    }
-
-    public void setmCenterPoint(Point mCenterPoint) {
-        this.mCenterPoint = mCenterPoint;
-        this.invalidate();
-    }
-
-    public int getmWidth() {
-        return mWidth;
-    }
-
-    public void setmWidth(int mWidth) {
-        this.mWidth = mWidth;
-        this.invalidate();
-    }
-
-    public ImageThumbnail(Context context, Bitmap image, Point center, int width, int height) {
+    public ImageThumbnail(Context context, Bitmap image, Point center) {
         super(context);
-        this.mContext = context;
         this.mImage = image;
         this.mCenterPoint = center;
-        this.mWidth = width;
-        this.mHeight = height;
-        this.setImageBitmap(image);
+        this.mPaint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG);
+        mPaint.setColor(STROKE_COLOR);
+        mPaint.setStrokeWidth(3.0f);
+        matrix = new Matrix();
+        matrix.postRotate(90);
+        this.mRotatedImage = Bitmap.createBitmap(mImage, 0, 0, mImage.getWidth(), mImage.getHeight(), matrix, false);
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
-        try {
-            if (canvas == null) return;
-            //this.mCanvas = canvas;
-            super.onDraw(canvas);
-            this.setTop(mCenterPoint.y - (mHeight / 2));
-            this.setBottom(mCenterPoint.y + (mHeight / 2));
-            this.setLeft(mCenterPoint.x - (mWidth / 2));
-            this.setRight(mCenterPoint.x + (mWidth / 2));
-            //this.draw(canvas);
-        } catch(Exception ex) {
-            android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this.mContext);
-            builder .setTitle("Błąd")
-                    .setMessage(ex.getMessage())
-                    .setNeutralButton("OK", null)
-                    .setCancelable(false)
-                    .show();
+        canvas.drawCircle(mCenterPoint.x, mCenterPoint.y, (mImage.getWidth() / 2) + 2.0f, mPaint);
+        canvas.drawBitmap(mRotatedImage, mCenterPoint.x - (mImage.getWidth() / 2), mCenterPoint.y - (mImage.getHeight() / 2), mPaint);
+        super.onDraw(canvas);
+    }
 
-        }
+
+    public void setPosition(Point newPosition) {
+        this.mCenterPoint = newPosition;
+        this.invalidate();
     }
 
 }

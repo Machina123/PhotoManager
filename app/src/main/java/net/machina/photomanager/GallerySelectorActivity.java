@@ -30,23 +30,6 @@ public class GallerySelectorActivity extends AppCompatActivity {
     protected ActivityMethod method;
     protected LinearLayout btnAddLibrary;
 
-    @Override
-    protected void onStart() {
-        if (!myDirectory.exists()) {
-            boolean success = myDirectory.mkdirs();
-            if (success) {
-                Toast.makeText(GallerySelectorActivity.this, "Stworzono katalog aplikacji", Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(GallerySelectorActivity.this, "Nie udało się stworzyć katalogu aplikacji", Toast.LENGTH_SHORT).show();
-            }
-        }
-
-        if (!generateStartingDirs()) {
-            Toast.makeText(this, "Nie udało się utworzyć katalogów", Toast.LENGTH_SHORT).show();
-        }
-
-        super.onStart();
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +58,19 @@ public class GallerySelectorActivity extends AppCompatActivity {
         } else finish();
 
         listDirs = (ListView) findViewById(R.id.listFolders);
+
+        if (!myDirectory.exists()) {
+            boolean success = myDirectory.mkdirs();
+            if (success) {
+                Toast.makeText(GallerySelectorActivity.this, "Stworzono katalog aplikacji", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(GallerySelectorActivity.this, "Nie udało się stworzyć katalogu aplikacji", Toast.LENGTH_SHORT).show();
+            }
+        }
+
+        if (!generateStartingDirs()) {
+            Toast.makeText(this, "Nie udało się utworzyć katalogów", Toast.LENGTH_SHORT).show();
+        }
 
         loadDirectories();
 
@@ -123,11 +119,6 @@ public class GallerySelectorActivity extends AppCompatActivity {
         return false;
     }
 
-    protected enum ActivityMethod {
-        ViewGallery,
-        TakePhoto
-    }
-
     public void loadDirectories() {
         directories.clear();
         if (myDirectory != null) {
@@ -159,5 +150,10 @@ public class GallerySelectorActivity extends AppCompatActivity {
                 }
             });
         }
+    }
+
+    protected enum ActivityMethod {
+        ViewGallery,
+        TakePhoto
     }
 }

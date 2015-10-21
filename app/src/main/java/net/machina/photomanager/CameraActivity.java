@@ -5,13 +5,11 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.Point;
 import android.graphics.Rect;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.Surface;
 import android.view.View;
@@ -23,15 +21,19 @@ import android.widget.Toast;
 
 import net.machina.photomanager.common.CameraPreview;
 import net.machina.photomanager.common.Circle;
-import net.machina.photomanager.common.Constants;
 import net.machina.photomanager.common.ImageThumbnail;
-import net.machina.photomanager.common.ScaledBitmap;
+import net.machina.photomanager.common.ImagingHelper;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 @SuppressWarnings("deprecation")
 public class CameraActivity extends AppCompatActivity implements View.OnClickListener {
 
+    protected static int cameraRotation;
     public String path;
     protected Camera camera;
     protected int cameraId;
@@ -41,7 +43,6 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
     protected ImageView btnAccept, btnReject;
     protected ImageView btnExposure, btnWhiteBalance, btnResolution;
     protected LinearLayout layoutCamSettings;
-
     protected int[] exposureLevels;
     protected String[] whiteBalanceLevels;
     protected Camera.Size[] photoSizeList;
@@ -52,15 +53,13 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
     protected boolean isCircleDrawn = false;
 
     protected ArrayList<byte[]> pictures = new ArrayList<>();
-    protected ArrayList<Bitmap> thumbnails = new ArrayList<>();
     protected ArrayList<ImageThumbnail> thumbnailViews = new ArrayList<>();
 
     protected Camera.PictureCallback jpegCallback = new Camera.PictureCallback() {
         @Override
         public void onPictureTaken(byte[] data, Camera camera) {
-            final byte[] thisData = data;
-            final Camera thisCamera = camera;
-            Rect displaySize = new Rect();
+
+            final Rect displaySize = new Rect();
             btnAccept.setVisibility(View.VISIBLE);
             btnReject.setVisibility(View.VISIBLE);
 
@@ -72,30 +71,70 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
             WindowManager wm = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
             wm.getDefaultDisplay().getRectSize(displaySize);
 
-            pictures.add(data);
-            thumbnails.add(ScaledBitmap.makeFromRaw(data, displaySize.width() / 10, displaySize.width() / 10));
-            ImageThumbnail thumbnail = new ImageThumbnail(CameraActivity.this,
-                    thumbnails.get(thumbnails.size() -1),
-                    circle.getPointOnCircle(0),
-                    displaySize.width() / 10,
-                    displaySize.width() / 10);
+            int bitmapScaleFactor = (displaySize.width() > displaySize.height() ? displaySize.height() / 7 : displaySize.width() / 7);
 
-            cameraPrev.addView(thumbnail);
-            //thumbnailViews.add(thumbnail);
+            pictures.add(ImagingHelper.getRawRotatedFromRaw(data, cameraRotation));
+            Bitmap scaledBitmap = ImagingHelper.makeScaledBitmapFromRaw(data, bitmapScaleFactor, bitmapScaleFactor);
+            ImageThumbnail mThumbnail = new ImageThumbnail(CameraActivity.this, ImagingHelper.getCircularBitmap(scaledBitmap), circle.getPointOnCircle(0));
+            mThumbnail.setId(0xdead0000 + thumbnailViews.size());
+            mThumbnail.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    final int selectedId = v.getId() - 0xdead0000;
+                    final View view = v;
+                    String[] options = {"Podgląd zdjęcia", "Usuń wybrane", "Usuń wszystkie", "Zapisz wybrane", "Zapisz wszystkie"};
+                    AlertDialog.Builder builder = new AlertDialog.Builder(CameraActivity.this);
+                    builder.setTitle("Wybrane zdjęcie: " + selectedId)
+                            .setItems(options, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    switch (which) {
+                                        case 0:
+                                            AlertDialog.Builder photo = new AlertDialog.Builder(CameraActivity.this);
+                                            ImageView image = new ImageView(CameraActivity.this);
+                                            image.setImageBitmap(ImagingHelper.makeScaledBitmapFromRaw(pictures.get(selectedId), displaySize.width() / 2, displaySize.height() / 2));
+                                            photo.setCancelable(true)
+                                                    .setView(image)
+                                                    .show();
+                                            break;
+                                        case 1:
+                                            pictures.remove(selectedId);
+                                            thumbnailViews.remove(selectedId);
+                                            cameraPrev.removeView(view);
+                                            realignPictures();
+                                            break;
+                                        case 2:
+                                            pictures.clear();
+                                            for (ImageThumbnail thumbnail : thumbnailViews) {
+                                                cameraPrev.removeView(thumbnail);
+                                            }
+                                            thumbnailViews.clear();
+                                            break;
+                                        case 3:
+                                            savePicture(pictures.get(selectedId));
+                                            break;
+                                        case 4:
+                                            for (int i = 0; i < pictures.size(); i++) {
+                                                savePicture(pictures.get(i));
+                                            }
+                                            break;
+                                        default:
+                                            return;
+                                    }
+                                }
+                            })
+                            .setCancelable(true)
+                            .show();
+
+                    return true;
+                }
+            });
+            cameraPrev.addView(mThumbnail);
+            thumbnailViews.add(mThumbnail);
+
+            realignPictures();
 
             camera.startPreview();
-/*
-
-            int newPicAngle = (int) ((2 * Math.PI) / thumbnailViews.size());
-
-            for (int i = 0; i < thumbnailViews.size(); i++) {
-                Point newPoint = circle.getPointOnCircle(i * newPicAngle);
-                Log.d(Constants.LOGGER_TAG, i + ": " + newPoint.toString());
-                thumbnailViews.get(i).setmCenterPoint(newPoint);
-                thumbnailViews.get(i).redraw();
-            }
-*/
-
 
             btnReject.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -114,7 +153,7 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
                 @Override
                 public void onClick(View v) {
                     /*
-                    SimpleDateFormat dFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
+                    SimpleDateFormat dFormat = new SimpleDateFormat("yyyyMMdd_HHmmssS");
                     String filename = dFormat.format(new Date());
                     File newPhoto = new File(path + "/" + filename + ".jpg");
                     try {
@@ -136,7 +175,6 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
             });
         }
     };
-
 
     public static void setCameraDisplayOrientation(Activity activity,
                                                    int cameraId, android.hardware.Camera camera) {
@@ -168,7 +206,30 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
         } else {  // back-facing
             result = (info.orientation - degrees + 360) % 360;
         }
+        cameraRotation = result;
         camera.setDisplayOrientation(result);
+    }
+
+    public void realignPictures() {
+        double newPicAngle = (2 * Math.PI) / thumbnailViews.size();
+        for (int i = 0; i < thumbnailViews.size(); i++) {
+            thumbnailViews.get(i).setPosition(circle.getPointOnCircle(i * newPicAngle));
+        }
+
+    }
+
+    public void savePicture(byte[] data) {
+        SimpleDateFormat dFormat = new SimpleDateFormat("yyyyMMdd_HHmmss_SSS");
+        String filename = dFormat.format(new Date());
+        File newPhoto = new File(path + "/" + filename + ".jpg");
+        try {
+            FileOutputStream fos = new FileOutputStream(newPhoto);
+            fos.write(data);
+            fos.close();
+        } catch (Exception e) {
+            Toast.makeText(CameraActivity.this, "Nie można było zapisać zdjęcia", Toast.LENGTH_SHORT).show();
+            e.printStackTrace();
+        }
     }
 
     @Override
