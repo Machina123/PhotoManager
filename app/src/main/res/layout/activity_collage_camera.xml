@@ -1,0 +1,90 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="net.machina.photomanager.CollageCameraActivity">
+
+    <FrameLayout
+        android:id="@+id/layoutCameraPreview2"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <LinearLayout
+        android:id="@+id/layoutCameraTop2"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_alignParentTop="true"
+        android:background="#7f000000"
+        android:orientation="horizontal">
+
+
+        <ImageView
+            android:id="@+id/btnExposure2"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="#00000000"
+            android:padding="16dp"
+            android:src="@mipmap/ic_exposure" />
+
+        <ImageView
+            android:id="@+id/btnWhiteBalance2"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="#00000000"
+            android:padding="16dp"
+            android:src="@mipmap/ic_whitebalance" />
+
+        <ImageView
+            android:id="@+id/btnResolution2"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="#00000000"
+            android:padding="16dp"
+            android:src="@mipmap/ic_resolution" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/layoutCameraBottom2"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_alignParentBottom="true"
+        android:background="#7f000000"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/btnAccept2"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="#00000000"
+            android:contentDescription="Akceptuj"
+            android:padding="12dp"
+            android:src="@mipmap/ic_accept"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/btnShutter2"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="#00000000"
+            android:clickable="true"
+            android:padding="4dp"
+            android:src="@mipmap/ic_shutter" />
+
+        <ImageView
+            android:id="@+id/btnReject2"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="#00000000"
+            android:contentDescription="Odrzuć"
+            android:padding="12dp"
+            android:src="@mipmap/ic_reject"
+            android:visibility="gone" />
+
+    </LinearLayout>
+</RelativeLayout>

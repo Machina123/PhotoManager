@@ -42,7 +42,30 @@
         </activity>
         <activity
             android:name=".GalleryActivity"
-            android:label="@string/title_activity_gallery">
+            android:label="@string/title_activity_gallery"></activity>
+        <activity
+            android:name=".CollagePickerActivity"
+            android:label="@string/title_activity_collage_picker"
+            android:parentActivityName=".HelloActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="net.machina.photomanager.HelloActivity" />
+        </activity>
+        <activity
+            android:name=".CollageActivity"
+            android:label="@string/title_activity_collage"
+            android:parentActivityName=".CollagePickerActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="net.machina.photomanager.CollagePickerActivity" />
+        </activity>
+        <activity
+            android:name="net.machina.photomanager.CollageCameraActivity"
+            android:label="@string/title_activity_collage_camera"
+            android:parentActivityName="net.machina.photomanager.CollageActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="net.machina.photomanager.CollageActivity" />
         </activity>
     </application>
 

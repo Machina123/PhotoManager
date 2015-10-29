@@ -327,6 +327,8 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
 
             camParams.getSupportedWhiteBalance().toArray(whiteBalanceLevels);
             camParams.getSupportedPictureSizes().toArray(photoSizeList);
+            camParams.setPictureSize(photoSizeList[0].width, photoSizeList[0].height);
+            camera.setParameters(camParams);
 
             final String[] resStrings = new String[photoSizeList.length];
             for(int i = 0; i < photoSizeList.length; i++) {

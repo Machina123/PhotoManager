@@ -11,4 +11,10 @@
     <string name="label_network">Zobacz w sieci</string>
     <string name="title_activity_gallery">GalleryActivity</string>
     <string name="label_addfolder">Dodaj bibliotekę</string>
+    <string name="title_activity_collage_picker">CollagePickerActivity</string>
+
+    <string name="title_activity_collage">CollageActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="title_activity_collage_camera">CollageCameraActivity</string>
 </resources>

@@ -56,6 +56,9 @@ public class HelloActivity extends AppCompatActivity implements View.OnClickList
                 intent.putExtras(extras);
                 startActivity(intent);
                 break;
+            case R.id.btnCollage:
+                intent = new Intent(HelloActivity.this, CollagePickerActivity.class);
+                startActivity(intent);
             default:
         }
     }
