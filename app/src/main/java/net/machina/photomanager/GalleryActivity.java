@@ -1,5 +1,6 @@
 package net.machina.photomanager;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Rect;
@@ -7,14 +8,11 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuItem;
-import android.widget.GridView;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import net.machina.photomanager.common.Constants;
-import net.machina.photomanager.common.ImagePreviewAdapter;
 import net.machina.photomanager.common.ImagingHelper;
 import net.machina.photomanager.common.ScreenHelper;
 
@@ -25,6 +23,7 @@ public class GalleryActivity extends AppCompatActivity {
 
     protected String displayPath;
     protected LinearLayout layoutPhotos;
+    protected ArrayList<String> files = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,7 +37,7 @@ public class GalleryActivity extends AppCompatActivity {
             displayPath = getIntent().getStringExtra("path");
             Log.d(Constants.LOGGER_TAG, displayPath);
             File myDir = new File(displayPath + "/");
-            ArrayList<String> files = new ArrayList<>();
+
             if (myDir != null) {
 
                 for (File file : myDir.listFiles()) {
@@ -50,11 +49,20 @@ public class GalleryActivity extends AppCompatActivity {
             Rect displaySize = ScreenHelper.getDisplaySize(GalleryActivity.this);
 
             for (int i = 0; i < files.size(); i++) {
+                final int index = i;
                 Bitmap fullSizeBitmap = BitmapFactory.decodeFile(files.get(i));
                 ImageView imagePrev = new ImageView(GalleryActivity.this);
                 imagePrev.setLayoutParams(new LinearLayout.LayoutParams(displaySize.width(), displaySize.height() / 5));
                 imagePrev.setScaleType(ImageView.ScaleType.CENTER_CROP);
                 imagePrev.setImageBitmap(ImagingHelper.getScaledBitmap(fullSizeBitmap, fullSizeBitmap.getWidth() / 2, fullSizeBitmap.getHeight() / 2));
+                imagePrev.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent launchIntent = new Intent(GalleryActivity.this, PhotoPreviewActivity.class);
+                        launchIntent.putExtra("path", files.get(index));
+                        startActivity(launchIntent);
+                    }
+                });
                 layoutPhotos.addView(imagePrev);
                 fullSizeBitmap.recycle();
             }
