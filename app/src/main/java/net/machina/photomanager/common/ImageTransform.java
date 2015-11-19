@@ -37,11 +37,19 @@ public class ImageTransform {
     };
 
     public static final float[] negative = {
-            -1, 0, 0, 0, 0,
-            0, -1, 0, 0, 0,
-            0, 0, -1, 0, 0,
+            -1, 0, 0, 1, 0,
+            0, -1, 0, 1, 0,
+            0, 0, -1, 1, 0,
             0, 0, 0, 1, 0
     };
+
+    public static final float[] sepia = {
+            1, 0, 0, 1, 0,
+            0, 1, 0, 0, 0,
+            0, 0, 0.8f, 1, 0,
+            0, 0, 0, 1, 0
+    };
+
 
     public static Bitmap applyColorMatrix(Bitmap src, ColorMatrix matrix) {
         Bitmap dest = Bitmap.createBitmap(src.getWidth(), src.getHeight(), src.getConfig());
@@ -52,13 +60,14 @@ public class ImageTransform {
         return dest;
     }
 
+
     /**
      * Zmiana jasności i kontrastu obrazka
      *
      * @param bt Jasność (-255..255)
      * @param ct Kontrast (0..10)
      */
-    public static Bitmap setContrastBrightness(Bitmap src, float bt, float ct) {
+    public static Bitmap setContrastBrightness(Bitmap src, float bt, float ct, float sat) {
 
         final float[] contrastBrightness = {
                 ct, 0, 0, 0, bt,
@@ -67,7 +76,10 @@ public class ImageTransform {
                 0, 0, 0, 1, 0
         };
 
-        ColorMatrix cbMatrix = new ColorMatrix(contrastBrightness);
+        ColorMatrix cbMatrix = new ColorMatrix(initial);
+        cbMatrix.reset();
+        cbMatrix.setSaturation(sat);
+        cbMatrix.postConcat(new ColorMatrix(contrastBrightness));
         Bitmap ret = applyColorMatrix(src, cbMatrix);
         return ret;
     }

@@ -1,11 +1,14 @@
 package net.machina.photomanager;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.ColorMatrix;
 import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageView;
@@ -18,9 +21,11 @@ import net.machina.photomanager.common.ImageTransform;
 public class PhotoPreviewActivity extends AppCompatActivity implements View.OnClickListener, SeekBar.OnSeekBarChangeListener {
 
     protected FlipStatus flipStatus = FlipStatus.NO_FLIP;
-    ImageView btnEditText, imgPreview, btnFlipPic, btnRotatePic, btnContrastPic;
-    LinearLayout layoutSliders;
-    SeekBar seekBrightness, seekContrast, seekSaturation;
+    protected ImageView btnEditText, imgPreview, btnFlipPic, btnRotatePic, btnContrastPic, btnColorEffectsPic;
+    protected LinearLayout layoutSliders;
+    protected SeekBar seekBrightness, seekContrast, seekSaturation;
+    protected Bitmap sourceBitmap, effectedBitmap;
+    protected ColorMatrix selectedTransform;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +46,9 @@ public class PhotoPreviewActivity extends AppCompatActivity implements View.OnCl
         btnContrastPic = (ImageView) findViewById(R.id.btnContrastPic);
         btnContrastPic.setOnClickListener(this);
 
+        btnColorEffectsPic = (ImageView) findViewById(R.id.btnColorEffectsPic);
+        btnColorEffectsPic.setOnClickListener(this);
+
         imgPreview = (ImageView) findViewById(R.id.imgFullscreen);
 
         seekBrightness = (SeekBar) findViewById(R.id.seekBrightness);
@@ -56,6 +64,9 @@ public class PhotoPreviewActivity extends AppCompatActivity implements View.OnCl
             String photoPath = extras.getString("path");
             Bitmap photo = BitmapFactory.decodeFile(photoPath);
             imgPreview.setImageBitmap(photo);
+            this.sourceBitmap = photo;
+            this.effectedBitmap = photo;
+            this.selectedTransform = new ColorMatrix(ImageTransform.initial);
             // photo.recycle();
         }
     }
@@ -77,9 +88,55 @@ public class PhotoPreviewActivity extends AppCompatActivity implements View.OnCl
             case R.id.btnContrastPic:
                 toggleSliders();
                 break;
+            case R.id.btnColorEffectsPic:
+                String[] effects = {"oryginalny", "tylko czerwony", "tylko zielony", "tylko niebieski", "negatyw", "sepia", "odcienie szarości"};
+                AlertDialog.Builder effectsDialog = new AlertDialog.Builder(PhotoPreviewActivity.this);
+                effectsDialog.setTitle("Wybierz efekt")
+                        .setItems(effects, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                ColorMatrix transformation;
+                                switch (which) {
+                                    case 1:
+                                        transformation = new ColorMatrix(ImageTransform.red);
+                                        break;
+                                    case 2:
+                                        transformation = new ColorMatrix(ImageTransform.green);
+                                        break;
+                                    case 3:
+                                        transformation = new ColorMatrix(ImageTransform.blue);
+                                        break;
+                                    case 4:
+                                        transformation = new ColorMatrix(ImageTransform.negative);
+                                        break;
+                                    case 5:
+                                        transformation = new ColorMatrix();
+                                        transformation.setSaturation(0);
+                                        ColorMatrix cm_sepia = new ColorMatrix();
+                                        cm_sepia.setScale(1, 1, 0.8f, 1);
+                                        transformation.postConcat(cm_sepia);
+                                        break;
+                                    case 6:
+                                        transformation = new ColorMatrix();
+                                        transformation.setSaturation(0);
+                                        break;
+                                    default:
+                                        transformation = new ColorMatrix(ImageTransform.initial);
+                                }
+                                setImageColorTransformation(transformation);
+                            }
+                        })
+                        .setCancelable(true)
+                        .show();
+                break;
             default:
                 return;
         }
+    }
+
+    public void setImageColorTransformation(ColorMatrix cm) {
+        imgPreview.setImageBitmap(ImageTransform.applyColorMatrix(effectedBitmap, cm));
+        this.selectedTransform = cm;
     }
 
     @Override
@@ -126,6 +183,8 @@ public class PhotoPreviewActivity extends AppCompatActivity implements View.OnCl
         transformMatrix.postScale(x, y);
         Bitmap source = ((BitmapDrawable) imgPreview.getDrawable()).getBitmap();
         Bitmap translated = Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), transformMatrix, false);
+        Bitmap sourceCopy = sourceBitmap;
+        sourceBitmap = Bitmap.createBitmap(sourceCopy, 0, 0, sourceCopy.getWidth(), sourceCopy.getHeight(), transformMatrix, false);
         imgPreview.setImageBitmap(translated);
     }
 
@@ -134,6 +193,8 @@ public class PhotoPreviewActivity extends AppCompatActivity implements View.OnCl
         transformMatrix.postRotate(90);
         Bitmap source = ((BitmapDrawable) imgPreview.getDrawable()).getBitmap();
         Bitmap translated = Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), transformMatrix, false);
+        Bitmap sourceCopy = sourceBitmap;
+        sourceBitmap = Bitmap.createBitmap(sourceCopy, 0, 0, sourceCopy.getWidth(), sourceCopy.getHeight(), transformMatrix, false);
         imgPreview.setImageBitmap(translated);
     }
 
@@ -154,15 +215,13 @@ public class PhotoPreviewActivity extends AppCompatActivity implements View.OnCl
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
         switch (seekBar.getId()) {
             case R.id.seekBrightness:
-                Bitmap src = ((BitmapDrawable) imgPreview.getDrawable()).getBitmap();
-                ImageTransform.setContrastBrightness(src, (-256 + (seekBrightness.getProgress() * 2.0f)), seekContrast.getProgress() / 25.5f);
-                break;
             case R.id.seekContrast:
-                Bitmap src2 = ((BitmapDrawable) imgPreview.getDrawable()).getBitmap();
-                ImageTransform.setContrastBrightness(src2, (-256 + (seekBrightness.getProgress() * 2.0f)), seekContrast.getProgress() / 25.5f);
-                break;
             case R.id.seekSaturation:
-
+                float contrast = 1 + (seekContrast.getProgress() / 0x3f);
+                float brightness = (-256 + (seekBrightness.getProgress() * 2.0f));
+                float saturation = seekSaturation.getProgress() / 25.5f;
+                effectedBitmap = ImageTransform.setContrastBrightness(sourceBitmap, brightness, contrast, saturation);
+                imgPreview.setImageBitmap(ImageTransform.applyColorMatrix(effectedBitmap, selectedTransform));
                 break;
         }
     }

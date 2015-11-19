@@ -37,8 +37,8 @@ public class TextPreview extends View {
         fillPaint.setAntiAlias(true);
         strokePaint.setAntiAlias(true);
 
-        fillPaint.setTextSize(130);
-        strokePaint.setTextSize(130);
+        fillPaint.setTextSize(120);
+        strokePaint.setTextSize(120);
 
         fillPaint.setTypeface(this.mFont);
         strokePaint.setTypeface(this.mFont);

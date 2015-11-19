@@ -9,7 +9,7 @@
     <RelativeLayout
         android:id="@+id/layoutTextPreview"
         android:layout_width="match_parent"
-        android:layout_height="80dp"
+        android:layout_height="130sp"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"

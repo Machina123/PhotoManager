@@ -46,6 +46,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:background="@android:color/transparent"
                 android:max="255"
                 android:progress="128" />
         </LinearLayout>
@@ -70,6 +71,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:background="@android:color/transparent"
                 android:max="255"
                 android:progress="25" />
         </LinearLayout>
@@ -94,6 +96,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:background="@android:color/transparent"
                 android:indeterminate="false"
                 android:max="255" />
         </LinearLayout>
@@ -140,6 +143,15 @@
             android:layout_weight="1"
             android:background="@android:color/transparent"
             android:src="@drawable/contrast25" />
+
+        <ImageView
+            android:id="@+id/btnColorEffectsPic"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="4dp"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:src="@drawable/paint88" />
     </LinearLayout>
 
 </RelativeLayout>
