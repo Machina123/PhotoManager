@@ -8,7 +8,9 @@
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="18" />
     <uses-permission android:name="android.permission.CAMERA" />
 
     <application
@@ -68,8 +70,9 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="net.machina.photomanager.CollageActivity" />
         </activity>
-        <activity android:name=".PhotoPreviewActivity"></activity>
-        <activity android:name=".TextEditActivity">
+        <activity android:name=".PhotoPreviewActivity" />
+        <activity android:name=".TextEditActivity"></activity>
+        <activity android:name=".NetworkActivity">
         </activity>
     </application>
 

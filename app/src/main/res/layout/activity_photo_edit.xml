@@ -37,9 +37,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:layout_weight="4"
+                android:layout_weight="3"
                 android:background="@android:color/transparent"
-                android:text="Jasność:" />
+                android:text="Jasność:"
+                android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium" />
 
             <SeekBar
                 android:id="@+id/seekBrightness"
@@ -62,9 +63,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:layout_weight="4"
+                android:layout_weight="3"
                 android:background="@android:color/transparent"
-                android:text="Kontrast:" />
+                android:text="Kontrast:"
+                android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium" />
 
             <SeekBar
                 android:id="@+id/seekContrast"
@@ -87,9 +89,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:layout_weight="4"
+                android:layout_weight="3"
                 android:background="@android:color/transparent"
-                android:text="Nasycenie:" />
+                android:text="Nasycenie:"
+                android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium" />
 
             <SeekBar
                 android:id="@+id/seekSaturation"

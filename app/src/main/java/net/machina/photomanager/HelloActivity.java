@@ -2,17 +2,22 @@ package net.machina.photomanager;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.View;
 import android.widget.RelativeLayout;
 
+import net.machina.photomanager.common.Networking;
+
 public class HelloActivity extends AppCompatActivity implements View.OnClickListener{
 
+    public Snackbar snackbar;
     protected RelativeLayout btnCamera;
     protected RelativeLayout btnGallery;
     protected RelativeLayout btnCollage;
     protected RelativeLayout btnNetwork;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -24,6 +29,17 @@ public class HelloActivity extends AppCompatActivity implements View.OnClickList
         btnNetwork = (RelativeLayout) findViewById(R.id.btnNetwork);
 
         if (btnNetwork != null && btnCollage != null && btnGallery != null && btnCamera != null) createListeners();
+        if (!Networking.isAvailable(HelloActivity.this)) {
+            snackbar = Snackbar.make(getWindow().getDecorView().getRootView(),
+                    R.string.error_no_intetnet,
+                    Snackbar.LENGTH_INDEFINITE);
+            snackbar.setAction("OK", new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    snackbar.dismiss();
+                }
+            }).show();
+        }
 
     }
 
@@ -60,6 +76,11 @@ public class HelloActivity extends AppCompatActivity implements View.OnClickList
             case R.id.btnCollage:
                 intent = new Intent(HelloActivity.this, CollagePickerActivity.class);
                 startActivity(intent);
+                break;
+            case R.id.btnNetwork:
+                intent = new Intent(HelloActivity.this, NetworkActivity.class);
+                startActivity(intent);
+                break;
             default:
         }
     }
