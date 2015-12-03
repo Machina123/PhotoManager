@@ -24,6 +24,7 @@ public class HelloActivity extends AppCompatActivity implements View.OnClickList
         btnNetwork = (RelativeLayout) findViewById(R.id.btnNetwork);
 
         if (btnNetwork != null && btnCollage != null && btnGallery != null && btnCamera != null) createListeners();
+
     }
 
     @Override
