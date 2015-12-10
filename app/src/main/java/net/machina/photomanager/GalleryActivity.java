@@ -46,11 +46,12 @@ public class GalleryActivity extends AppCompatActivity {
                 }
             }
 
-            Rect displaySize = ScreenHelper.getDisplaySize(GalleryActivity.this);
+            final Rect displaySize = ScreenHelper.getDisplaySize(GalleryActivity.this);
 
             for (int i = 0; i < files.size(); i++) {
                 final int index = i;
                 Bitmap fullSizeBitmap = BitmapFactory.decodeFile(files.get(i));
+                if (fullSizeBitmap == null) continue;
                 ImageView imagePrev = new ImageView(GalleryActivity.this);
                 imagePrev.setLayoutParams(new LinearLayout.LayoutParams(displaySize.width(), displaySize.height() / 5));
                 imagePrev.setScaleType(ImageView.ScaleType.CENTER_CROP);
@@ -60,6 +61,7 @@ public class GalleryActivity extends AppCompatActivity {
                     public void onClick(View v) {
                         Intent launchIntent = new Intent(GalleryActivity.this, PhotoPreviewActivity.class);
                         launchIntent.putExtra("path", files.get(index));
+                        launchIntent.putExtra("parent", displayPath);
                         startActivity(launchIntent);
                     }
                 });

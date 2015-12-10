@@ -1,5 +1,6 @@
 package net.machina.photomanager;
 
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -7,6 +8,8 @@ import android.graphics.BitmapFactory;
 import android.graphics.ColorMatrix;
 import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -17,18 +20,40 @@ import android.widget.SeekBar;
 import android.widget.Toast;
 
 import net.machina.photomanager.common.ImageTransform;
+import net.machina.photomanager.common.ImagingHelper;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ByteArrayEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStreamReader;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class PhotoPreviewActivity extends AppCompatActivity implements View.OnClickListener, SeekBar.OnSeekBarChangeListener {
 
+    public static final String API_LOCATION = "http://4ib2.spec.pl.hostingasp.pl/Ciepiela_Patryk/PhotoManager/Save.aspx";
+
     protected FlipStatus flipStatus = FlipStatus.NO_FLIP;
-    protected ImageView btnEditText, imgPreview, btnFlipPic, btnRotatePic, btnContrastPic, btnColorEffectsPic;
+    protected ImageView btnEditText, imgPreview, btnFlipPic, btnRotatePic, btnContrastPic, btnColorEffectsPic, btnSharePic;
     protected LinearLayout layoutSliders;
     protected SeekBar seekBrightness, seekContrast, seekSaturation;
-    protected Bitmap sourceBitmap, effectedBitmap;
+    protected Bitmap sourceBitmap, effectedBitmap, sendableBitmap;
     protected ColorMatrix selectedTransform;
+    protected String filePath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        if (getIntent().getExtras() != null) {
+            filePath = getIntent().getStringExtra("parent");
+        } else {
+            finish();
+        }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_photo_edit);
 
@@ -48,6 +73,9 @@ public class PhotoPreviewActivity extends AppCompatActivity implements View.OnCl
 
         btnColorEffectsPic = (ImageView) findViewById(R.id.btnColorEffectsPic);
         btnColorEffectsPic.setOnClickListener(this);
+
+        btnSharePic = (ImageView) findViewById(R.id.btnSharePic);
+        btnSharePic.setOnClickListener(this);
 
         imgPreview = (ImageView) findViewById(R.id.imgFullscreen);
 
@@ -124,6 +152,31 @@ public class PhotoPreviewActivity extends AppCompatActivity implements View.OnCl
                                         transformation = new ColorMatrix(ImageTransform.initial);
                                 }
                                 setImageColorTransformation(transformation);
+                            }
+                        })
+                        .setCancelable(true)
+                        .show();
+                break;
+            case R.id.btnSharePic:
+                CharSequence[] items = {"Zapisz w galerii", "Udostępnij innej aplikacji", "Prześlij na serwer"};
+                AlertDialog.Builder builder = new AlertDialog.Builder(PhotoPreviewActivity.this);
+                builder.setTitle("Udostępnij zdjęcie")
+                        .setItems(items, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                switch (which) {
+                                    case 0:
+                                        savePhoto();
+                                        break;
+                                    case 1:
+                                        sharePhoto();
+                                        break;
+                                    case 2:
+                                        uploadPhoto();
+                                        break;
+                                    default:
+                                        return;
+                                }
                             }
                         })
                         .setCancelable(true)
@@ -234,6 +287,60 @@ public class PhotoPreviewActivity extends AppCompatActivity implements View.OnCl
     public void onStopTrackingTouch(SeekBar seekBar) {
     }
 
+    public void uploadPhoto() {
+        sendableBitmap = ((BitmapDrawable) imgPreview.getDrawable()).getBitmap();
+        new NetworkTask().execute();
+    }
+
+    public void sharePhoto() {
+        SimpleDateFormat dFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
+        String filename = dFormat.format(new Date());
+        sendableBitmap = ((BitmapDrawable) imgPreview.getDrawable()).getBitmap();
+        File rootDir = new File(filePath);
+        File newPhoto = new File(rootDir.getParent() + "/PhotoManager-" + filename + ".jpg");
+        try {
+            FileOutputStream fos = new FileOutputStream(newPhoto);
+            fos.write(ImagingHelper.getRawFromBitmap(sendableBitmap));
+            fos.close();
+            Intent shareIntent = new Intent(Intent.ACTION_SEND);
+            shareIntent.setType("image/jpeg");
+            shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://" + newPhoto.getAbsolutePath()));
+            startActivity(Intent.createChooser(shareIntent, "Udostępnij plik"));
+
+        } catch (Exception e) {
+            //Toast.makeText(PhotoPreviewActivity.this, "Nie można było zapisać zdjęcia", Toast.LENGTH_SHORT).show();
+            e.printStackTrace();
+            AlertDialog.Builder builder = new AlertDialog.Builder(PhotoPreviewActivity.this);
+            builder.setTitle("Błąd")
+                    .setMessage("Nie można było udostępnić pliku:\n" + e.getMessage())
+                    .setCancelable(false)
+                    .setPositiveButton("OK", null)
+                    .show();
+        } finally {
+            sendableBitmap.recycle();
+        }
+
+    }
+
+    public void savePhoto() {
+        SimpleDateFormat dFormat = new SimpleDateFormat("yyyyMMdd_HHmmss_SSS");
+        String filename = dFormat.format(new Date());
+        sendableBitmap = ((BitmapDrawable) imgPreview.getDrawable()).getBitmap();
+        File newPhoto = new File(filePath + "/" + filename + ".jpg");
+        try {
+            FileOutputStream fos = new FileOutputStream(newPhoto);
+            fos.write(ImagingHelper.getRawFromBitmap(sendableBitmap));
+            fos.close();
+            Toast.makeText(PhotoPreviewActivity.this, "Zapisano zdjęcie!", Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            Toast.makeText(PhotoPreviewActivity.this, "Nie można było zapisać zdjęcia", Toast.LENGTH_SHORT).show();
+            e.printStackTrace();
+        } finally {
+            sendableBitmap.recycle();
+        }
+
+    }
+
     protected enum FlipStatus {
         NO_FLIP,
         VERTICAL,
@@ -254,6 +361,52 @@ public class PhotoPreviewActivity extends AppCompatActivity implements View.OnCl
                 default:
                     throw new IllegalArgumentException("Błędny parametr!");
             }
+        }
+    }
+
+    @SuppressWarnings("deprecation")
+    public class NetworkTask extends AsyncTask<Void, Void, String> {
+        private ProgressDialog dialog = new ProgressDialog(PhotoPreviewActivity.this);
+
+        @Override
+        protected String doInBackground(Void... params) {
+            final Bitmap fileToSend = sendableBitmap;
+            HttpClient client = new DefaultHttpClient();
+            HttpPost httpPost = new HttpPost(API_LOCATION);
+            httpPost.setEntity(new ByteArrayEntity(ImagingHelper.getRawFromBitmap(fileToSend)));
+            HttpResponse response = null;
+            try {
+                response = client.execute(httpPost);
+                BufferedReader reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent(), "UTF-8"));
+                String responseGet;
+                String resp = "";
+                while ((responseGet = reader.readLine()) != null) {
+                    resp += responseGet;
+                }
+                return resp;
+            } catch (Exception e) {
+                e.printStackTrace();
+                return e.getMessage();
+            } finally {
+                fileToSend.recycle();
+            }
+        }
+
+        @Override
+        protected void onPreExecute() {
+            dialog.setMessage("Oczekiwanie na odpowiedź serwera");
+            dialog.show();
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            dialog.dismiss();
+            AlertDialog.Builder builder = new AlertDialog.Builder(PhotoPreviewActivity.this);
+            builder.setTitle("Odpowiedź z serwera")
+                    .setMessage(result)
+                    .setCancelable(false)
+                    .setPositiveButton("OK", null)
+                    .show();
         }
     }
 
