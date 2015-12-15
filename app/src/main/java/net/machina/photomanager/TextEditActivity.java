@@ -14,6 +14,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import net.machina.photomanager.common.ColorPickerDialog;
 import net.machina.photomanager.common.Constants;
@@ -88,14 +89,7 @@ public class TextEditActivity extends AppCompatActivity implements TextWatcher, 
                 pickerStroke.show();
                 break;
             case R.id.btnAcceptText:
-//                Log.d(Constants.LOGGER_TAG, "Wyjście z sukcesem");
-//                Intent intent = new Intent();
-//                intent.putExtra("fillColor", fillColor);
-//                intent.putExtra("strokeColor", strokeColor);
-//                intent.putExtra("text", editTextPreview.getText().toString());
-//                intent.putExtra("typeface", selectedTypeface);
-//                setResult(10000, intent);
-//                TextEditActivity.this.finishActivity(10000);
+                Toast.makeText(TextEditActivity.this, "Wyjście DO CHOLERY", Toast.LENGTH_SHORT).show();
                 finishSuccess();
                 break;
             case R.id.btnRejectText:
@@ -169,7 +163,7 @@ public class TextEditActivity extends AppCompatActivity implements TextWatcher, 
         intent.putExtra("text", editTextPreview.getText().toString());
         intent.putExtra("typeface", selectedTypeface);
         setResult(10000, intent);
-        TextEditActivity.this.finishActivity(10000);
+        finish();
     }
 
     @Override

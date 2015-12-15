@@ -18,6 +18,7 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:largeHeap="true"
         android:theme="@style/AppTheme" >
         <activity
             android:name=".HelloActivity"
@@ -31,7 +32,7 @@
         <activity
             android:name=".GallerySelectorActivity"
             android:label="@string/title_activity_picture"
-            android:parentActivityName=".HelloActivity">
+            android:parentActivityName=".HelloActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="net.machina.photomanager.HelloActivity" />
@@ -50,7 +51,7 @@
         <activity
             android:name=".CollagePickerActivity"
             android:label="@string/title_activity_collage_picker"
-            android:parentActivityName=".HelloActivity">
+            android:parentActivityName=".HelloActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="net.machina.photomanager.HelloActivity" />
@@ -58,7 +59,7 @@
         <activity
             android:name=".CollageActivity"
             android:label="@string/title_activity_collage"
-            android:parentActivityName=".CollagePickerActivity">
+            android:parentActivityName=".CollagePickerActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="net.machina.photomanager.CollagePickerActivity" />
@@ -66,14 +67,16 @@
         <activity
             android:name=".CollageCameraActivity"
             android:label="@string/title_activity_collage_camera"
-            android:parentActivityName=".CollageActivity">
+            android:parentActivityName=".CollageActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="net.machina.photomanager.CollageActivity" />
         </activity>
-        <activity android:name=".PhotoPreviewActivity" />
-        <activity android:name=".TextEditActivity"></activity>
-        <activity android:name=".NetworkActivity">
+        <activity android:name=".PhotoEditActivity" />
+        <activity android:name=".TextEditActivity" />
+        <activity android:name=".NetworkActivity" >
+        </activity>
+        <activity android:name=".PhotoPreviewActivity" >
         </activity>
     </application>
 

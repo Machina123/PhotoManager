@@ -53,7 +53,7 @@ public class CollageActivity extends AppCompatActivity {
                 image.setY(displaySize.y * component.getY());
                 image.setLayoutParams(new LinearLayout.LayoutParams((int) (displaySize.x * component.getWidth()), (int) (displaySize.y * component.getHeight())));
                 image.setBackgroundColor(0xff7f7f7f);
-                image.setScaleType(ImageView.ScaleType.CENTER);
+                image.setScaleType(ImageView.ScaleType.CENTER_CROP);
                 image.setImageResource(R.mipmap.ic_camera);
                 image.setId(10000 + i);
                 image.setOnClickListener(new View.OnClickListener() {
@@ -81,7 +81,7 @@ public class CollageActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Toast.makeText(CollageActivity.this, "Wyszło - " + requestCode + " / " + resultCode + " / " + (data == null ? "nie ma danych" : "są dane"), Toast.LENGTH_SHORT).show();
+        //Toast.makeText(CollageActivity.this, "Wyszło - " + requestCode + " / " + resultCode + " / " + (data == null ? "nie ma danych" : "są dane"), Toast.LENGTH_SHORT).show();
         if (data != null) {
             ImageView selectedImage = (ImageView) CollageActivity.this.findViewById(selectedId);
             if (data.getByteArrayExtra("data") != null) {

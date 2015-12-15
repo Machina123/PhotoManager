@@ -45,21 +45,58 @@ public class CollagePickerActivity extends AppCompatActivity implements View.OnC
 
     @Override
     public void onClick(View v) {
+        ArrayList<CollageComponent> components = null;
+
         switch (v.getId()) {
+            case R.id.btnCollage1:
+                components = new ArrayList<>(2);
+                components.add(new CollageComponent(0,0,0.5f, 1f));
+                components.add(new CollageComponent(0.5f, 0, 0.5f, 1f));
+                break;
+            case R.id.btnCollage2:
+                components = new ArrayList<>(3);
+                components.add(new CollageComponent(0, 0, 1f, 0.33333f));
+                components.add(new CollageComponent(0, 0.333333f, 1f, 0.33333f));
+                components.add(new CollageComponent(0, 0.666667f, 1f, 0.33333f));
+                break;
             case R.id.btnCollage3:
-                ArrayList<CollageComponent> components = new ArrayList<>(4);
+                components = new ArrayList<>(4);
                 components.add(new CollageComponent(0, 0, 0.5f, 1f));
                 components.add(new CollageComponent(0.5f, 0, 0.5f, 0.3333f));
                 components.add(new CollageComponent(0.5f, 0.3333f, 0.5f, 0.3333f));
                 components.add(new CollageComponent(0.5f, 0.6666f, 0.5f, 0.3333f));
-
-                Intent collageStarter = new Intent(CollagePickerActivity.this, CollageActivity.class);
-                collageStarter.putExtra("components", components);
-                startActivity(collageStarter);
-
                 break;
-            default:
-                Toast.makeText(CollagePickerActivity.this, "Not yet implemented", Toast.LENGTH_SHORT).show();
+            case R.id.btnCollage4:
+                components = new ArrayList<>(5);
+                components.add(new CollageComponent(0,0,0.5f,0.33333f));
+                components.add(new CollageComponent(0.5f,0,0.5f,0.33333f));
+                components.add(new CollageComponent(0,0.33333f,1f,0.33333f));
+                components.add(new CollageComponent(0,0.66667f,0.5f,0.33333f));
+                components.add(new CollageComponent(0.5f,0.66667f,0.5f,0.33333f));
+                break;
+            case R.id.btnCollage5:
+                components = new ArrayList<>(6);
+                components.add(new CollageComponent(0,0,0.5f, 0.33333f));
+                components.add(new CollageComponent(0.5f,0,0.5f, 0.33333f));
+                components.add(new CollageComponent(0,0.333333f,0.5f, 0.33333f));
+                components.add(new CollageComponent(0.5f,0.333333f,0.5f, 0.33333f));
+                components.add(new CollageComponent(0,0.666667f,0.5f, 0.33333f));
+                components.add(new CollageComponent(0.5f,0.666667f,0.5f, 0.33333f));
+                break;
+            case R.id.btnCollage6:
+                components = new ArrayList<>(8);
+                components.add(new CollageComponent(0,0,0.5f, 0.25f));
+                components.add(new CollageComponent(0.5f,0,0.5f, 0.25f));
+                components.add(new CollageComponent(0,0.25f,0.5f, 0.25f));
+                components.add(new CollageComponent(0.5f,0.25f,0.5f, 0.25f));
+                components.add(new CollageComponent(0,0.5f,0.5f, 0.25f));
+                components.add(new CollageComponent(0.5f,0.5f,0.5f, 0.25f));
+                components.add(new CollageComponent(0,0.75f,0.5f, 0.25f));
+                components.add(new CollageComponent(0.5f,0.75f,0.5f, 0.25f));
+                break;
         }
+        Intent collageStarter = new Intent(CollagePickerActivity.this, CollageActivity.class);
+        collageStarter.putExtra("components", components);
+        startActivity(collageStarter);
     }
 }

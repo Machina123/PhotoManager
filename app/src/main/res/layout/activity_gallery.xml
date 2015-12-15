@@ -3,7 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="net.machina.photomanager.GalleryActivity"
-    android:padding="0dp">
+    android:padding="0dp"
+    android:background="@android:color/black">
 
 
     <ScrollView

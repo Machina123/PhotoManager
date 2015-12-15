@@ -76,15 +76,15 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
             pictures.add(ImagingHelper.getRawRotatedFromRaw(data, cameraRotation));
             Bitmap scaledBitmap = ImagingHelper.makeScaledBitmapFromRaw(data, bitmapScaleFactor, bitmapScaleFactor);
             ImageThumbnail mThumbnail = new ImageThumbnail(CameraActivity.this, ImagingHelper.getCircularBitmap(scaledBitmap), circle.getPointOnCircle(0));
-            mThumbnail.setId(0xdead0000 + thumbnailViews.size());
+            mThumbnail.setId(10000 + thumbnailViews.size());
             mThumbnail.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
-                    final int selectedId = v.getId() - 0xdead0000;
+                    final int selectedId = v.getId() - 10000;
                     final View view = v;
                     String[] options = {"Podgląd zdjęcia", "Usuń wybrane", "Usuń wszystkie", "Zapisz wybrane", "Zapisz wszystkie"};
                     AlertDialog.Builder builder = new AlertDialog.Builder(CameraActivity.this);
-                    builder.setTitle("Wybrane zdjęcie: " + selectedId)
+                    builder.setTitle("Wybrane zdjęcie")
                             .setItems(options, new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {

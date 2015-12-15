@@ -1,5 +1,6 @@
 package net.machina.photomanager;
 
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -14,6 +15,7 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import net.machina.photomanager.common.Constants;
@@ -31,12 +33,15 @@ public class GallerySelectorActivity extends AppCompatActivity {
     protected File myDirectory = new File(startingDir.getPath() + "/" + Constants.APP_FOLDER + "/");
     protected ActivityMethod method;
     protected FloatingActionButton btnAddLibrary;
-
+    protected ProgressDialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_picture);
+        dialog = new ProgressDialog(GallerySelectorActivity.this);
+        dialog.setMessage("Proszę czekać - trwa ładowanie galerii");
+        dialog.setCancelable(false);
 
         btnAddLibrary = (FloatingActionButton) findViewById(R.id.btnNewGallery);
 
@@ -102,6 +107,12 @@ public class GallerySelectorActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        dialog.dismiss();
+    }
+
     public boolean generateStartingDirs() {
         String[] startDirs = {"miejsca", "osoby", "przedmioty"};
         boolean isSuccess = true;
@@ -144,11 +155,13 @@ public class GallerySelectorActivity extends AppCompatActivity {
                             startActivity(intent);
                             break;
                         case ViewGallery:
+                            dialog.show();
                             intent = new Intent(GallerySelectorActivity.this, GalleryActivity.class);
                             intent.putExtras(extras);
                             startActivity(intent);
                             break;
                     }
+
                 }
             });
 
