@@ -240,7 +240,8 @@ public class PhotoEditActivity extends AppCompatActivity implements View.OnClick
     }
 
     public void setImageColorTransformation(ColorMatrix cm) {
-        imgPreview.setImageBitmap(ImageTransform.applyColorMatrix(effectedBitmap, cm));
+        effectedBitmap = ImageTransform.applyColorMatrix(sourceBitmap, cm);
+        imgPreview.setImageBitmap(effectedBitmap);
         this.selectedTransform = cm;
     }
 
