@@ -1,5 +1,6 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context="net.machina.photomanager.GallerySelectorActivity"
@@ -11,28 +12,21 @@
         android:layout_height="match_parent"
         android:layout_weight="1" />
 
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="9"
-        android:id="@+id/btnNewGallery">
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/btnNewGallery"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@mipmap/ic_addfolder"
+        app:elevation="6dp"
+        app:pressedTranslationZ="12dp"
+        app:rippleColor="#ff303F9F"
+        app:backgroundTint="#ff1A237E"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginBottom="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_gravity="right" />
 
-        <ImageView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/imageView5"
-            android:layout_weight="8"
-            android:src="@mipmap/ic_addfolder" />
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="@string/label_addfolder"
-            android:id="@+id/textView5"
-            android:layout_weight="2"
-            android:layout_gravity="center_vertical"
-            android:gravity="center_vertical" />
-    </LinearLayout>
-</LinearLayout>
+</RelativeLayout>

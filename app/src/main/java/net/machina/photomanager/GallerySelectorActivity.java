@@ -4,8 +4,10 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
@@ -28,7 +30,7 @@ public class GallerySelectorActivity extends AppCompatActivity {
     protected ArrayList<DirectoryEntry> directories = new ArrayList<>();
     protected File myDirectory = new File(startingDir.getPath() + "/" + Constants.APP_FOLDER + "/");
     protected ActivityMethod method;
-    protected LinearLayout btnAddLibrary;
+    protected FloatingActionButton btnAddLibrary;
 
 
     @Override
@@ -36,7 +38,7 @@ public class GallerySelectorActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_picture);
 
-        btnAddLibrary = (LinearLayout) findViewById(R.id.btnNewGallery);
+        btnAddLibrary = (FloatingActionButton) findViewById(R.id.btnNewGallery);
 
         Bundle extras = getIntent().getExtras();
 
@@ -147,6 +149,37 @@ public class GallerySelectorActivity extends AppCompatActivity {
                             startActivity(intent);
                             break;
                     }
+                }
+            });
+
+            listDirs.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+                @Override
+                public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                    final int dirPos = position;
+                    AlertDialog.Builder builder = new AlertDialog.Builder(GallerySelectorActivity.this);
+                    builder .setTitle("Pytanie")
+                            .setMessage("Czy chcesz usunąć tę galerię?\nUwaga: usunięte zostaną WSZYSTKIE pliki znajdujące się wewnątrz folderu")
+                            .setPositiveButton("Tak", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    File removedDir =new File(directories.get(dirPos).getPath());
+
+                                    for(File file : removedDir.listFiles()) {
+                                        Log.d(Constants.LOGGER_TAG, "Usuwanie pliku " + file.getName());
+                                        file.delete();
+                                    }
+                                    if(removedDir.delete()) {
+                                        Toast.makeText(GallerySelectorActivity.this, "Usunięto galerię \"" + directories.get(dirPos).getName() + "\"", Toast.LENGTH_SHORT).show();
+                                        directories.remove(dirPos);
+                                    } else {
+                                        Toast.makeText(GallerySelectorActivity.this, "Nie udało się usunąć katalogu", Toast.LENGTH_SHORT).show();
+                                    }
+                                    loadDirectories();
+                                }
+                            })
+                            .setNegativeButton("Nie", null)
+                            .show();
+                    return true;
                 }
             });
         }

@@ -105,7 +105,7 @@ public class PhotoPreviewActivity extends AppCompatActivity implements View.OnCl
             case R.id.btnEditFont:
                 //Toast.makeText(PhotoPreviewActivity.this, "przechodzenie do activity", Toast.LENGTH_SHORT).show();
                 Intent launchIntent = new Intent(PhotoPreviewActivity.this, TextEditActivity.class);
-                startActivityForResult(launchIntent, 10000);
+                PhotoPreviewActivity.this.startActivityForResult(launchIntent, 10000);
                 break;
             case R.id.btnFlipPic:
                 flipPicture();
@@ -197,7 +197,7 @@ public class PhotoPreviewActivity extends AppCompatActivity implements View.OnCl
         switch (requestCode) {
             case 10000:
                 switch (resultCode) {
-                    case 0:
+                    case 10000:
                         Toast.makeText(PhotoPreviewActivity.this, "Otrzymano odpowiedź", Toast.LENGTH_SHORT).show();
                         break;
                     default:
@@ -316,8 +316,6 @@ public class PhotoPreviewActivity extends AppCompatActivity implements View.OnCl
                     .setCancelable(false)
                     .setPositiveButton("OK", null)
                     .show();
-        } finally {
-            sendableBitmap.recycle();
         }
 
     }
@@ -335,10 +333,7 @@ public class PhotoPreviewActivity extends AppCompatActivity implements View.OnCl
         } catch (Exception e) {
             Toast.makeText(PhotoPreviewActivity.this, "Nie można było zapisać zdjęcia", Toast.LENGTH_SHORT).show();
             e.printStackTrace();
-        } finally {
-            sendableBitmap.recycle();
         }
-
     }
 
     protected enum FlipStatus {

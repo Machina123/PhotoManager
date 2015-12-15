@@ -88,14 +88,15 @@ public class TextEditActivity extends AppCompatActivity implements TextWatcher, 
                 pickerStroke.show();
                 break;
             case R.id.btnAcceptText:
-                Log.d(Constants.LOGGER_TAG, "Wyjście z sukcesem");
-                Intent intent = new Intent();
-                intent.putExtra("fillColor", fillColor)
-                        .putExtra("strokeColor", strokeColor)
-                        .putExtra("text", editTextPreview.getText().toString())
-                        .putExtra("typeface", selectedTypeface);
-                setResult(0, intent);
-                TextEditActivity.this.finishActivity(10000);
+//                Log.d(Constants.LOGGER_TAG, "Wyjście z sukcesem");
+//                Intent intent = new Intent();
+//                intent.putExtra("fillColor", fillColor);
+//                intent.putExtra("strokeColor", strokeColor);
+//                intent.putExtra("text", editTextPreview.getText().toString());
+//                intent.putExtra("typeface", selectedTypeface);
+//                setResult(10000, intent);
+//                TextEditActivity.this.finishActivity(10000);
+                finishSuccess();
                 break;
             case R.id.btnRejectText:
                 Log.d(Constants.LOGGER_TAG, "Wyjście - porażka");
@@ -160,6 +161,16 @@ public class TextEditActivity extends AppCompatActivity implements TextWatcher, 
         TextEditActivity.this.finishActivity(10000);
     }
 
+    public void finishSuccess() {
+        Log.d(Constants.LOGGER_TAG, "Wyjście z sukcesem");
+        Intent intent = new Intent();
+        intent.putExtra("fillColor", fillColor);
+        intent.putExtra("strokeColor", strokeColor);
+        intent.putExtra("text", editTextPreview.getText().toString());
+        intent.putExtra("typeface", selectedTypeface);
+        setResult(10000, intent);
+        TextEditActivity.this.finishActivity(10000);
+    }
 
     @Override
     public void onBackPressed() {

@@ -10,6 +10,8 @@ import java.io.Serializable;
  */
 public class CollageComponent implements Serializable {
 
+    public CollageComponent() {}
+
     public CollageComponent(float x, float y, float width, float height) {
         this.x = x;
         this.y = y;
