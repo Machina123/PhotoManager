@@ -1,8 +1,14 @@
 package net.machina.photomanager;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Point;
+import android.net.Uri;
+import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.style.RelativeSizeSpan;
@@ -60,9 +66,27 @@ public class CollageActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View v) {
                         selectedId = v.getId();
-                        Toast.makeText(CollageActivity.this, "Przekazane ID: " + selectedId, Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent(CollageActivity.this, CollageCameraActivity.class);
-                        startActivityForResult(intent, 12345);
+                        final String[] items = {"zrób zdjęcie", "pobierz z galerii"};
+                        AlertDialog.Builder builder = new AlertDialog.Builder(CollageActivity.this);
+                        builder.setTitle("Wybierz źródło zdjęcia")
+                                .setItems(items, new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        switch (which) {
+                                            case 0:
+                                                Intent intent = new Intent(CollageActivity.this, CollageCameraActivity.class);
+                                                startActivityForResult(intent, 12345);
+                                                break;
+                                            case 1:
+                                                Intent i = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                                                startActivityForResult(i, 10000);
+                                                break;
+                                        }
+                                    }
+                                })
+                                .setCancelable(true)
+                                .show();
+
                     }
                 });
                 layoutCollage.addView(image);
@@ -81,14 +105,31 @@ public class CollageActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        //Toast.makeText(CollageActivity.this, "Wyszło - " + requestCode + " / " + resultCode + " / " + (data == null ? "nie ma danych" : "są dane"), Toast.LENGTH_SHORT).show();
         if (data != null) {
             ImageView selectedImage = (ImageView) CollageActivity.this.findViewById(selectedId);
-            if (data.getByteArrayExtra("data") != null) {
-                Bitmap bitmap = ImagingHelper.getScaledBitmap(ImagingHelper.getRotatedBitmapFromRaw(data.getByteArrayExtra("data"), 90), selectedImage.getWidth(), selectedImage.getHeight());
-                selectedImage.setImageBitmap(bitmap);
-            } else {
-                Toast.makeText(CollageActivity.this, "Nie przekazano tablicy bajtów", Toast.LENGTH_SHORT).show();
+            switch (requestCode) {
+                case 12345:
+                    if (data.getByteArrayExtra("data") != null) {
+                        Bitmap bitmap = ImagingHelper.getScaledBitmap(ImagingHelper.getRotatedBitmapFromRaw(data.getByteArrayExtra("data"), 90), selectedImage.getWidth(), selectedImage.getHeight());
+                        selectedImage.setImageBitmap(bitmap);
+                    } else {
+                        Toast.makeText(CollageActivity.this, "Nie przekazano tablicy bajtów", Toast.LENGTH_SHORT).show();
+                    }
+                    break;
+                case 10000:
+                    if (resultCode == RESULT_OK) {
+                        Uri selectedImageUri = data.getData();
+                        String[] filePathColumn = {MediaStore.Images.Media.DATA};
+                        Cursor cursor = getContentResolver().query(selectedImageUri, filePathColumn, null, null, null);
+                        cursor.moveToFirst();
+                        int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+                        String picturePath = cursor.getString(columnIndex);
+                        cursor.close();
+                        selectedImage.setImageBitmap(BitmapFactory.decodeFile(picturePath));
+                    } else {
+                        Toast.makeText(CollageActivity.this, "Zdjęcie z galerii nie zostało przesłane", Toast.LENGTH_SHORT).show();
+                    }
+                    break;
             }
         }
     }

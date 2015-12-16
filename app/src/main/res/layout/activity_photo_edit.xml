@@ -7,15 +7,23 @@
     tools:context="net.machina.photomanager.PhotoEditActivity"
     android:id="@+id/layoutEditMain">
 
-    <ImageView
-        android:id="@+id/imgFullscreen"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_margin="0dp"
-        android:background="#ff000000"
-        android:scaleType="centerInside" />
+        android:layout_above="@+id/layoutEditingPanel"
+        android:id="@+id/layoutEditPic">
+
+        <ImageView
+            android:id="@+id/imgFullscreen"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_margin="0dp"
+            android:background="#ff000000"
+            android:scaleType="centerInside" />
+
+    </RelativeLayout>
 
     <LinearLayout
         android:id="@+id/layoutSliders"

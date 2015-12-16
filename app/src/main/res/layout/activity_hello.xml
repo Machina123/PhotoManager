@@ -4,29 +4,67 @@
     android:padding="0dp"
     tools:context=".HelloActivity">
 
-    <ImageView
-        android:id="@+id/imageBegin"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="160sp"
-        android:layout_alignParentEnd="false"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginBottom="0dp"
-        android:layout_marginRight="0dp"
-        android:contentDescription="Description"
-        android:padding="0dp"
-        android:scaleType="centerCrop"
-        android:src="@drawable/monstercat" />
+        android:layout_height="280dp"
+        android:id="@+id/layoutDisplay">
+
+        <ImageView
+            android:id="@+id/imageBegin"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentEnd="false"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginBottom="0dp"
+            android:layout_marginRight="0dp"
+            android:contentDescription="Description"
+            android:padding="0dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/monstercat" />
+
+        <ImageView
+            android:layout_width="64dp"
+            android:layout_height="match_parent"
+            android:id="@+id/btnHelloNextImage"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:src="@drawable/right218"
+            android:visibility="visible" />
+
+        <ImageView
+            android:layout_width="64dp"
+            android:layout_height="match_parent"
+            android:id="@+id/btnHelloPrevImage"
+            android:layout_centerVertical="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:src="@drawable/left207"
+            android:visibility="visible" />
+
+        <ProgressBar
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/prgSpinner"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true"
+            android:visibility="invisible" />
+
+    </RelativeLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_below="@+id/imageBegin"
         android:orientation="vertical"
-        android:weightSum="2">
+        android:weightSum="2"
+        android:layout_toEndOf="@id/layoutDisplay"
+        android:layout_below="@+id/layoutDisplay"
+        android:id="@+id/linearLayout2">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -81,7 +119,8 @@
                     android:layout_margin="32dp"
                     android:background="#00ffffff"
                     android:contentDescription="Galeria"
-                    android:src="@mipmap/ic_gallery" />
+                    android:src="@mipmap/ic_gallery"
+                    android:scaleType="fitCenter" />
 
                 <TextView
                     android:id="@+id/textView2"
@@ -120,7 +159,8 @@
                     android:layout_centerVertical="true"
                     android:layout_margin="32dp"
                     android:background="#00ffffff"
-                    android:src="@mipmap/ic_collage" />
+                    android:src="@mipmap/ic_collage"
+                    android:scaleType="fitCenter" />
 
                 <TextView
                     android:id="@+id/textView3"
@@ -148,7 +188,8 @@
                     android:layout_centerHorizontal="true"
                     android:layout_centerVertical="true"
                     android:layout_margin="32dp"
-                    android:src="@mipmap/ic_network" />
+                    android:src="@mipmap/ic_network"
+                    android:scaleType="fitCenter" />
 
                 <TextView
                     android:id="@+id/textView4"

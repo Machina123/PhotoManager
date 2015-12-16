@@ -42,7 +42,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class PhotoEditActivity extends AppCompatActivity implements View.OnClickListener, SeekBar.OnSeekBarChangeListener, View.OnTouchListener{
+public class PhotoEditActivity extends AppCompatActivity implements View.OnClickListener, SeekBar.OnSeekBarChangeListener, View.OnTouchListener {
 
     public static final String API_LOCATION = "http://4ib2.spec.pl.hostingasp.pl/Ciepiela_Patryk/PhotoManager/Save.aspx";
 
@@ -69,7 +69,7 @@ public class PhotoEditActivity extends AppCompatActivity implements View.OnClick
         setContentView(R.layout.activity_photo_edit);
 
         layoutSliders = (LinearLayout) findViewById(R.id.layoutSliders);
-        layoutEdit = (RelativeLayout) findViewById(R.id.layoutEditMain);
+        layoutEdit = (RelativeLayout) findViewById(R.id.layoutEditPic);
 
         btnBack = (ImageView) findViewById(R.id.btnBackEditor);
         btnBack.setOnClickListener(this);
@@ -252,7 +252,7 @@ public class PhotoEditActivity extends AppCompatActivity implements View.OnClick
                 switch (resultCode) {
                     case 10000:
                         //Toast.makeText(PhotoEditActivity.this, "Otrzymano odpowiedź: " + (data == null ? "nie ma danych" : "są dane"), Toast.LENGTH_SHORT).show();
-                        TextPreview preview = new TextPreview(PhotoEditActivity.this, data.getStringExtra("text"), data.getIntExtra("fillColor",0), data.getIntExtra("strokeColor",0), tfList.get(data.getIntExtra("typeface", 0)));
+                        TextPreview preview = new TextPreview(PhotoEditActivity.this, data.getStringExtra("text"), data.getIntExtra("fillColor", 0), data.getIntExtra("strokeColor", 0), tfList.get(data.getIntExtra("typeface", 0)));
                         layoutEdit.addView(preview);
                         preview.setOnTouchListener(this);
                         break;
@@ -288,36 +288,45 @@ public class PhotoEditActivity extends AppCompatActivity implements View.OnClick
     }
 
     public void flipPicture(float x, float y) {
+        Bitmap source, translated, sourceCopy;
         try {
             Matrix transformMatrix = new Matrix();
             transformMatrix.postScale(x, y);
-            Bitmap source = ((BitmapDrawable) imgPreview.getDrawable()).getBitmap();
-            Bitmap translated = Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), transformMatrix, false);
-            Bitmap sourceCopy = sourceBitmap;
+            source = ((BitmapDrawable) imgPreview.getDrawable()).getBitmap();
+            translated = Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), transformMatrix, false);
+            sourceCopy = sourceBitmap;
             sourceBitmap = Bitmap.createBitmap(sourceCopy, 0, 0, sourceCopy.getWidth(), sourceCopy.getHeight(), transformMatrix, false);
             imgPreview.setImageBitmap(translated);
-        } catch(OutOfMemoryError e) {
-            Toast.makeText(PhotoEditActivity.this, "Brak ", Toast.LENGTH_SHORT).show();
-
+        } catch (OutOfMemoryError e) {
+            Toast.makeText(PhotoEditActivity.this, "Brak pamięci na dokończenie operacji", Toast.LENGTH_SHORT).show();
+        } finally {
+            System.gc();
         }
     }
 
     @Override
     public void onTrimMemory(int level) {
         super.onTrimMemory(level);
-        if(level == TRIM_MEMORY_RUNNING_LOW) {
+        if (level == TRIM_MEMORY_RUNNING_LOW) {
             System.gc();
         }
     }
 
     public void rotatePicture() {
-        Matrix transformMatrix = new Matrix();
-        transformMatrix.postRotate(90);
-        Bitmap source = ((BitmapDrawable) imgPreview.getDrawable()).getBitmap();
-        Bitmap translated = Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), transformMatrix, false);
-        Bitmap sourceCopy = sourceBitmap;
-        sourceBitmap = Bitmap.createBitmap(sourceCopy, 0, 0, sourceCopy.getWidth(), sourceCopy.getHeight(), transformMatrix, false);
-        imgPreview.setImageBitmap(translated);
+        Bitmap source, translated, sourceCopy;
+        try {
+            Matrix transformMatrix = new Matrix();
+            transformMatrix.postRotate(90);
+            source = ((BitmapDrawable) imgPreview.getDrawable()).getBitmap();
+            translated = Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), transformMatrix, false);
+            sourceCopy = sourceBitmap;
+            sourceBitmap = Bitmap.createBitmap(sourceCopy, 0, 0, sourceCopy.getWidth(), sourceCopy.getHeight(), transformMatrix, false);
+            imgPreview.setImageBitmap(translated);
+        } catch (OutOfMemoryError e) {
+            Toast.makeText(PhotoEditActivity.this, "Brak pamięci na dokończenie operacji", Toast.LENGTH_SHORT).show();
+        } finally {
+            System.gc();
+        }
     }
 
     public void toggleSliders() {
@@ -430,7 +439,7 @@ public class PhotoEditActivity extends AppCompatActivity implements View.OnClick
             tfList.clear();
             String[] fontList = getAssets().list("fonts");
 
-            for(String font : fontList) {
+            for (String font : fontList) {
                 Typeface tf = Typeface.createFromAsset(getAssets(), "fonts/" + font);
                 tfList.add(tf);
             }
